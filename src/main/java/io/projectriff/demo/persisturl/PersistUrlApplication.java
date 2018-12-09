@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.lang.NonNull;
 
@@ -25,7 +25,7 @@ public class PersistUrlApplication {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        return new JedisConnectionFactory(new RedisStandaloneConfiguration(
+        return new LettuceConnectionFactory(new RedisStandaloneConfiguration(
                         "my-redis-master.default.svc.cluster.local"));
         // TODO parameterize this
     }

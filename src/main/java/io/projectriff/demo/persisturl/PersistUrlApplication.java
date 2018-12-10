@@ -25,14 +25,14 @@ public class PersistUrlApplication {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
+        // TODO parameterize this
         return new LettuceConnectionFactory(new RedisStandaloneConfiguration(
                         "my-redis-master.default.svc.cluster.local"));
-        // TODO parameterize this
     }
 
 
     @Bean
-    public Function<String, Boolean> printToLog() {
+    public Function<String, Boolean> persistUrl() {
         return s -> {
             System.out.println("Got URL:"+s);
             writeToRedis(s);
@@ -41,11 +41,12 @@ public class PersistUrlApplication {
     }
 
     protected void writeToRedis(@NonNull String s) {
-        String[] arr = s.split(":");
-        if (arr.length < 2) {
-            throw new IllegalStateException("cannot split " + s);
+        int splitIndex = s.indexOf(':');
+        if (splitIndex < 0 || splitIndex == s.length() + 1 ) {
+            // delimiter not found, or delimiter is last
+            throw new IllegalArgumentException("expected form key:value but was "+s);
         }
-        redisTemplate.opsForValue().set(arr[0], arr[1]);
+        redisTemplate.opsForValue().set(s.substring(0, splitIndex), s.substring(splitIndex + 1));
     }
 
     public static void main(String[] args) {
